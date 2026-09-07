@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>สายรหัส</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@400;600;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+
+  <div class="bg-gallery" id="bg-gallery"></div>
+  <div class="bg-overlay"></div>
+
+  <div class="betsim-takeover hidden" id="betsim-takeover">
+    <div class="betsim-loading-dim" id="betsim-loading">
+      <div class="betsim-loading-box">
+        <div class="betsim-loading-spinner"></div>
+        <div class="betsim-loading-text">Loading sim...</div>
+      </div>
+    </div>
+    <div class="betsim-iframe-wrap hidden" id="betsim-iframe-wrap">
+      <iframe id="betsim-iframe" allow="fullscreen"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="admin-confirm-modal">
+    <div class="card modal-box">
+      <div class="eyebrow">แอดมิน</div>
+      <h1 style="font-size: 24px;">เข้าสู่แผงควบคุมแอดมิน?</h1>
+      <div class="modal-actions">
+        <button id="admin-confirm-yes">เข้าสู่ระบบ</button>
+        <button id="admin-confirm-no" class="btn-secondary">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="admin-overlay">
+    <div class="card admin-box" id="admin-box">
+
+      <div id="admin-panel-content" class="hidden">
+        <div class="eyebrow">แอดมิน</div>
+        <h1 style="font-size: 26px; margin-bottom: 20px;">แผงควบคุม</h1>
+
+        <div class="hint-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div style="font-family:'Kanit',sans-serif; font-weight:700; color: var(--orange-bright);">เวลาเปิดให้ทาย</div>
+          <input id="admin-open-date-input" type="datetime-local" />
+          <div class="firstname-sub" id="admin-open-countdown"></div>
+
+          <div style="font-family:'Kanit',sans-serif; font-weight:700; color: var(--orange-bright); margin-top: 10px;">เวลาเฉลย</div>
+          <input id="admin-reveal-date-input" type="datetime-local" />
+          <div class="firstname-sub" id="admin-reveal-countdown"></div>
+
+          <button id="admin-save-dates-btn" style="margin-top: 14px;">บันทึกเวลา</button>
+          <div class="error" id="admin-dates-error"></div>
+        </div>
+
+        <div style="margin-top: 26px;">
+          <div class="hints-title" style="margin-bottom: 12px;">สรุปการทายทั้งหมด</div>
+          <button id="admin-refresh-summary-btn" class="btn-secondary" style="margin-top: 0; margin-bottom: 14px;">รีเฟรชข้อมูล</button>
+          <div id="admin-summary-list"></div>
+        </div>
+
+        <button id="admin-close-btn" class="btn-secondary" style="margin-top: 22px;">ปิด</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIEW 1: Login -->
+  <div class="card" id="login-view">
+    <div class="eyebrow">สายรหัสกรุ๊ป <span id="admin-k-badge" role="button" tabindex="0" aria-label="admin" style="cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;">K</span></div>
+    <h1>กรอกชื่อน้อง</h1>
+    <div class="sub"></div>
+
+    <label for="username">ชื่อน้อง</label>
+    <div class="field">
+      <input id="username" type="text" placeholder="พิมพ์ชื่อเล่น หรือ ชื่อจริง..." autocomplete="off" />
+      <div class="suggest-list hidden" id="suggest-list"></div>
+    </div>
+
+    <button id="login-btn">เข้าสู่ระบบ</button>
+    <div class="error" id="login-error"></div>
+  </div>
+
+  <!-- VIEW 1.5: Photo Vote (shown after login, before hints) -->
+  <div class="card hidden" id="photo-vote-view">
+    <div class="eyebrow">โหวต</div>
+    <h1 style="font-size: 30px;">น้องๆคิดยังไงกับรูปนี้</h1>
+    <div class="sub">แอค</div>
+
+    <img id="vote-photo-img" src="https://i.ibb.co/Lz2tmr5n/Save-Clip-App-775799401-17904798735532504-3292068172356910273-n.jpg" alt="vote photo"
+         style="width:100%; border:2px solid var(--orange); box-shadow: 5px 5px 0 rgba(181,31,13,.5); margin-bottom: 24px; display:block; object-fit:cover;" />
+
+    <div id="vote-buttons" style="display:flex; gap:12px;">
+      <button id="btn-vote-hod" style="margin-top:0;">โคตรโหด</button>
+      <button id="btn-vote-meun" class="btn-secondary" style="margin-top:0;">โคตรมึน โคตรเอ๋อ ปัญญาอ่อน</button>
+    </div>
+
+    <div id="vote-results" class="hidden" style="margin-top:24px; text-align:left;">
+      <div class="hint-item" style="flex-direction:column; align-items:stretch; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-family:'Kanit',sans-serif; font-weight:700;">
+          <span style="color: var(--orange-bright);">โหด</span>
+          <span id="vote-hod-pct">0%</span>
+        </div>
+        <div style="background:#050505; height:14px; border:1px solid #5d351e;">
+          <div id="vote-hod-bar" style="background:linear-gradient(90deg,var(--orange),var(--yellow)); height:100%; width:0%; transition: width .4s ease;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-family:'Kanit',sans-serif; font-weight:700; margin-top:10px;">
+          <span style="color:var(--muted);">เอ๋อ</span>
+          <span id="vote-meun-pct">0%</span>
+        </div>
+        <div style="background:#050505; height:14px; border:1px solid #5d351e;">
+          <div id="vote-meun-bar" style="background:#5d351e; height:100%; width:0%; transition: width .4s ease;"></div>
+        </div>
+      </div>
+      <div class="firstname-sub" id="vote-total" style="margin-top:14px; text-align:center;"></div>
+    </div>
+
+    <button id="btn-vote-continue" class="hidden" style="margin-top:24px;">ไปต่อ</button>
+  </div>
+
+  <!-- VIEW 2: Dashboard / Hints -->
+  <div class="card dash-card hidden" id="lilbro-waiting-view">
+    <div class="role-tag">น้องรหัส</div>
+    <div class="name-display" id="lilbro-nickname"></div>
+    <div class="firstname-sub" id="lilbro-sub"></div>
+
+    <div class="hints-wrapper hidden" id="hints-wrapper">
+      <div class="hints-title">คำใบ้จากพี่รหัส</div>
+      <div id="hints-list"></div>
+    </div>
+    
+    <button id="go-to-guess-btn" class="hidden">ทายชื่อพี่รหัส</button>
+    <div class="error" id="dash-error"></div>
+  </div>
+
+  <!-- VIEW 3: Punishment Warning -->
+  <div class="card dash-card hidden" id="punishment-warning-view">
+    <div class="eyebrow">คำเตือน</div>
+    <h1 style="font-size: 28px;">บทลงโทษ</h1>
+    <div class="hint-item" style="margin-top: 20px; text-align: left;">
+      <span class="hint-text" id="punishment-warning-text" style="color: #ff6c4a; font-weight: 500;"></span>
+    </div>
+    <button id="btn-warning-ack">เข้าใจแล้วค่ะ พร้อมทาย<br>ไม่บิด100%</button>
+  </div>
+
+  <!-- VIEW 4: Select Big Bro Grid -->
+  <div class="card hidden" id="bigbro-search-view">
+    <div class="role-tag">ทายชื่อพี่รหัส</div>
+    <h1 style="font-size: 30px;">เลือกพี่รหัสของน้อง</h1>
+    <div class="sub" style="margin-bottom: 12px;">แตะที่กล่องชื่อเพื่อเลือกพี่รหัสที่ต้องการทาย</div>
+
+    <div class="field" style="margin-bottom: 12px;">
+      <input id="bigbro-search-input" type="text" placeholder="พิมพ์เพื่อกรองชื่อพี่รหัส..." autocomplete="off" style="padding: 12px 16px; font-size: 15px;" />
+    </div>
+
+    <div class="bigbro-grid" id="bigbro-grid"></div>
+  </div>
+
+  <!-- MODAL: Confirmation Window -->
+  <div class="modal-overlay hidden" id="guess-modal">
+    <div class="card modal-box">
+      <div class="eyebrow">ยืนยันการทาย</div>
+      <h1 style="font-size: 26px; margin: 10px 0 0;">ต้องการทายว่าพี่รหัสคือ:</h1>
+      
+      <div class="name-display" id="modal-bigbro-name" style="color: var(--yellow); margin: 16px 0 4px; font-size: 38px;"></div>
+      <div class="firstname-sub" id="modal-bigbro-sub" style="margin-bottom: 12px;"></div>
+
+      <div class="hint-item" style="margin-top: 10px; text-align: left; background: rgba(255, 201, 40, .06); border-color: rgba(255, 201, 40, .3);">
+        <span class="hint-text" style="font-size: 13px; color: var(--muted); line-height: 1.5;">
+          เปลี่ยนคำตอบได้ ก่อนเฉลย
+        </span>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-modal-cancel" class="btn-secondary">ยกเลิก</button>
+        <button id="btn-modal-confirm">ยืนยันคำตอบ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 5: Guess Confirmation -->
+  <div class="card dash-card hidden" id="guess-confirm-view">
+    <div class="eyebrow">บันทึกคำตอบแล้ว</div>
+    <h1 style="font-size: 28px;">น้องทายว่าพี่รหัสคือ:</h1>
+    <div class="name-display" id="confirm-guess-name" style="color: var(--yellow); margin: 20px 0;"></div>
+    
+    <div class="hints-wrapper" style="text-align: center;">
+      <div class="hints-title" style="margin: 0 auto 10px;">ในสายรหัสทายใครกัน</div>
+      <div style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">(ถ้ามีคนใดคนหนึ่งในนี้ทายถูก รอดทั้งสาย)</div>
+      <div class="teammate-list" id="confirm-teammates"></div>
+    </div>
+
+    <button id="btn-change-guess" class="btn-secondary">เปลี่ยนคำตอบ</button>
+  </div>
+
+  <!-- VIEW 6: Reveal (content filled only after server confirms reveal phase) -->
+  <div class="card dash-card hidden" id="reveal-view">
+    <div class="role-tag" id="reveal-tag">เฉลยสายรหัส</div>
+    <h1 id="reveal-status-title" style="font-size: 40px; margin-bottom: 20px;"></h1>
+    
+    <div class="firstname-sub">พี่รหัสของน้องคือ</div>
+    <div class="name-display" id="reveal-real-bigbro" style="margin-bottom: 4px;"></div>
+    <div class="firstname-sub" id="reveal-real-bigbro-branch" style="margin-bottom: 30px;"></div>
+
+    <div class="hints-wrapper" style="text-align: center; margin-bottom: 24px;">
+      <div class="hints-title" style="margin: 0 auto 10px;">k k k กุใหญ่ k k k กุเข็ง k k k กุ ยาว</div>
+      <div class="teammate-list" id="reveal-teammates"></div>
+    </div>
+
+    <div class="hint-item hidden" id="reveal-punishment-box" style="text-align: left; border-color: var(--red);">
+      <span class="hint-text" id="reveal-punishment-text" style="color: #ff6c4a; font-weight: 600;"></span>
+    </div>
+  </div>
+
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
