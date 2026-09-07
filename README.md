@@ -1,7 +1,5 @@
 live/used cloudflare-deployed project for group K / made in july 2026 / **ai generated** (i had no knowledge at the time) / now used for learning backend development
 
-unique_users ~ 150
-
 # Kyai สายรหัส — BigBro/LilBro Code-Name Guessing Game
 
 A web game for Thai university orientation ("รับน้อง" / "สายรหัส") events:
